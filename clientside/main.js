@@ -39,32 +39,15 @@ var possibleBrickColors = {
     purple: '#663399'
 };
 
-// var bricks = [];
 
 var rightPressed = false;
 var leftPressed = false;
-var isPaused = false;
-var onAutopilot = false;
 var doDisplayDebugInfo = false;
-
-
-// var powerups = [];
-
-// var lives = 3;
-
-var gameState = 'inplay';
-
-// var score = 0;
-// var calculatedMaximumScore = 0;
-
-
-
 
 //we want the chances of any given brick being gold to be rare and dependant on the size of the brick array
 var chanceOfBrickBeingGold = 3 / (brickRowCount * brickColumnCount);
 
 var chanceOfBrickBeingPurple = 1 / (brickRowCount * brickColumnCount);
-
 
 
 //HELPERS
@@ -244,13 +227,9 @@ function bounceBallOffWallsOrPaddle(){
         ball.dy = -ball.dy;
     }
     else if(isBottomHit) {
-        //YOU LOSE
         --game.lives;
-        if(!game.lives){
-            console.log('LOSS! do something else here!')
-            // gameState = "loss";
-        }
-        else {
+
+        if(game.lives !== 0){
             ball.reset();
         }
     }
@@ -303,7 +282,7 @@ function draw() {
     drawPaddle();
     drawLives();
     drawScore();
-    drawGameState();
+
     animatePhantomObjects();
 
     if(doDisplayDebugInfo){
@@ -313,7 +292,7 @@ function draw() {
     }
 
 
-    if(onAutopilot){
+    if(game.onAutopilot){
         doAutopilotInstructions();
     }
 
@@ -345,13 +324,13 @@ function draw() {
     }
 
     //continue the game loop
-    if(!isPaused){
+    if(!game.isPaused){
         requestAnimationFrame(draw);
     }
     
-    const hasNoLivesLeft = (game.lives <= 0 );
-    const hasWon = checkForWin();
-    if(hasNoLivesLeft || hasWon){
+    game.calculateGameState();
+    drawGameState();
+    if(game.hasWon || game.hasLost){
         ball.dx = 0;
         ball.dy = 0;
     }
@@ -366,11 +345,11 @@ function keyDownHandler(e) {
         leftPressed = true;
     } else if(e.keyCode === 65){
         //"a" key. toggle autopilot!
-        onAutopilot = !onAutopilot;
+        game.onAutopilot = !game.onAutopilot;
     } else if(e.keyCode === 80){
         //"p" key. toggle pause!
-        isPaused = !isPaused;
-        if(!isPaused) {
+        game.isPaused = !game.isPaused;
+        if(!game.isPaused) {
             draw();
         }
     } else if(e.keyCode === 32){
@@ -392,7 +371,7 @@ function keyUpHandler(e) {
 }
 
 function mouseMoveHandler(e) {
-    if(onAutopilot && e.human !== false){
+    if(game.onAutopilot && e.human !== false){
         return;
     }
     
@@ -413,16 +392,6 @@ function mouseMoveHandler(e) {
     }
 }
 
-
-function checkForWin(){
-    //finding if all the bricks are destroyed
-    var output = game.bricks.some(function(col){
-        return col.some(function(brick){
-            return brick.status === 1;
-        });
-    });
-    return !output;
-}
 
 
 function animatePhantomBrick(brickObj, opacity){
@@ -556,11 +525,12 @@ function drawGameState() {
 
     let message = '';
 
-    if(gameState === 'inplay'){
+
+    if(!game.hasWon && !game.hasLost){
         message = 'Ball in play! Good luck.';
-    } else if(lives === 0){
+    } else if(game.hasLost){
         message = 'You lost. Refresh to play again!';
-    } else {
+    } else if(game.hasWon) {
         message = 'Congrats! Refresh to play again!';
     }
     game.ctx.fillText(message, 100, 20);
