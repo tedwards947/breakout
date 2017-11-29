@@ -1,9 +1,8 @@
 
-
-
 var canvas = document.getElementById('canvas');
 var ctx = canvas.getContext('2d');
 
+const game = new Game(canvas, ctx, 0, 3);
 
 
 var INITIAL_DX_MAGNITUDE = 4;
@@ -42,9 +41,6 @@ var possibleBrickColors = {
 
 var bricks = [];
 
-const GRAVITY = 0.02;
-
-
 var rightPressed = false;
 var leftPressed = false;
 var isPaused = false;
@@ -60,6 +56,8 @@ var gameState = 'inplay';
 
 var score = 0;
 var calculatedMaximumScore = 0;
+
+
 
 
 //we want the chances of any given brick being gold to be rare and dependant on the size of the brick array
@@ -97,40 +95,6 @@ function loopThroughBricks(cb){
             cb(columnIndex, rowIndex);
         });
     });
-}
-function roundRect(_ctx, _x, _y, _width, _height, _radius, _fill, _stroke) {
-    if (typeof _stroke == 'undefined') {
-        _stroke = true;
-    }
-    if (typeof _radius === 'undefined') {
-        _radius = 5;
-    }
-    if (typeof _radius === 'number') {
-        _radius = { tl: _radius, tr: _radius, br: _radius, bl: _radius };
-    } else {
-        var defaultRadius = { tl: 0, tr: 0, br: 0, bl: 0 };
-        for (var side in defaultRadius) {
-            _radius[side] = _radius[side] || defaultRadius[side];
-        }
-    }
-    _ctx.beginPath();
-    _ctx.moveTo(_x + _radius.tl, _y);
-    _ctx.lineTo(_x + _width - _radius.tr, _y);
-    _ctx.quadraticCurveTo(_x + _width, _y, _x + _width, _y + _radius.tr);
-    _ctx.lineTo(_x + _width, _y + _height - _radius.br);
-    _ctx.quadraticCurveTo(_x + _width, _y + _height, _x + _width - _radius.br, _y + _height);
-    _ctx.lineTo(_x + _radius.bl, _y + _height);
-    _ctx.quadraticCurveTo(_x, _y + _height, _x, _y + _height - _radius.bl);
-    _ctx.lineTo(_x, _y + _radius.tl);
-    _ctx.quadraticCurveTo(_x, _y, _x + _radius.tl, _y);
-    if (_fill) {
-        _ctx.fillStyle = _fill;
-        _ctx.fill();
-    }
-    if (_stroke) {
-        _ctx.stroke();
-    }
-    _ctx.closePath();
 }
 function hexToRgb(hex) {
     var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -609,30 +573,32 @@ function updateDebugInfo(){
     document.getElementById('velocity').innerText = `(${ball.dx},${ball.dy}`;
 }
 function drawVelocityMarkers(){
+    //REFACTOR THIS TO USE ctx.rect instead!
+
+
+        // //draw positive velocity graph
+        // ctx.beginPath();
+        // roundRect(ctx, 95, 50, 5, 50, 0, "black", 0);
+        // ctx.closePath();
+        // //draw negative velocity graph
+        // ctx.beginPath();
+        // roundRect(ctx, 95, 100, 5, 50, 0, "red", 0);
+        // ctx.closePath();
     
-        //draw positive velocity graph
-        ctx.beginPath();
-        roundRect(ctx, 95, 50, 5, 50, 0, "black", 0);
-        ctx.closePath();
-        //draw negative velocity graph
-        ctx.beginPath();
-        roundRect(ctx, 95, 100, 5, 50, 0, "red", 0);
-        ctx.closePath();
+        // //draw a graph of paddle velocity!
+        // ctx.beginPath();
+        // roundRect(ctx, 100, 100, 20, paddle.velocity, 0, paddle.color, 0);
+        // ctx.closePath();
     
-        //draw a graph of paddle velocity!
-        ctx.beginPath();
-        roundRect(ctx, 100, 100, 20, paddle.velocity, 0, paddle.color, 0);
-        ctx.closePath();
+        // //draw a graph of ball X velocity
+        // ctx.beginPath();
+        // roundRect(ctx, 120, 100, 20, ball.dx * 5, 0, 'yellow', 0);
+        // ctx.closePath();
     
-        //draw a graph of ball X velocity
-        ctx.beginPath();
-        roundRect(ctx, 120, 100, 20, ball.dx * 5, 0, 'yellow', 0);
-        ctx.closePath();
-    
-        //draw a graph of ball Y velocity
-        ctx.beginPath();
-        roundRect(ctx, 140, 100, 20, ball.dy * 5, 0, 'green', 0);
-        ctx.closePath();
+        // //draw a graph of ball Y velocity
+        // ctx.beginPath();
+        // roundRect(ctx, 140, 100, 20, ball.dy * 5, 0, 'green', 0);
+        // ctx.closePath();
     }
 
 
