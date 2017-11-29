@@ -324,14 +324,6 @@ function drawPowerups(){
     });
 }
 
-function determinePaddleVelocity(){
-    //use to determine ball boosting speed
-    const paddleVelocity = paddle.previousFrameX - paddle.x;
-
-    paddle.previousFrameX = paddle.x;
-    paddle.velocity = paddleVelocity;
-}
-
 function resetBall(){
     ball.isLaunched = false;
 
@@ -348,6 +340,7 @@ function draw() {
     if(isPaused){
         return;
     }
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawBricks();
     drawBall();
@@ -360,6 +353,7 @@ function draw() {
 
     if(doDisplayDebugInfo){
         updateDebugInfo();
+        paddle.updatePaddleVelocity();
         drawVelocityMarkers();
     }
 
@@ -368,19 +362,15 @@ function draw() {
         doAutopilotInstructions();
     }
 
-    determinePaddleVelocity();
 
     brickCollisionDetection();
     bounceBallOffWallsOrPaddle();
-
 
 
     if(ball.isLaunched){
         //if the ball is launched, calculate the ball's next position.
         ball.x += ball.dx;
         ball.y += ball.dy;
-
-        // ball.dy = ball.dy + GRAVITY;
 
         if(ball.dx === 0 && ball.dy === 0){
             resetBall();
@@ -390,13 +380,13 @@ function draw() {
         resetBall();
     }
 
-
-    //animate the paddle
+    
+    //animate the paddle if keyboard controls are used
     if(rightPressed && paddle.x < canvas.width - paddle.width) {
-        paddle.x += 7;
+        paddle.move(paddle.x += 7);
     }
     else if(leftPressed && paddle.x > 0) {
-        paddle.x -= 7;
+        paddle.move(paddle.x -= 7);
     }
 
     //continue the game loop
@@ -462,7 +452,7 @@ function mouseMoveHandler(e) {
             newPaddleX = canvas.width - paddle.width;
         }
 
-        paddle.x = newPaddleX;
+        paddle.move(newPaddleX);
     }
 }
 

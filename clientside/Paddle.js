@@ -1,8 +1,6 @@
-
-
-
 function Paddle(x = 0, height = 20, width = 100, color = '#0095DD', radius = 5){
     this.x = x;
+    this.y = canvas.height;
     this.height = height;
     this.width = width;
     this.color = color;
@@ -14,9 +12,20 @@ function Paddle(x = 0, height = 20, width = 100, color = '#0095DD', radius = 5){
     //the previous frame's position. used to calculate velocity
     this.previousFrameX = 0;
 
-
     this.type = 'paddle';
+
+    const pathPoints = this.getPathPoints();
+    this.shape = new SAT.Polygon(new SAT.Vector(0,0), pathPoints.map(function(pt){
+        return new SAT.Vector(pt.x, pt.y);
+    }));
 }
+Paddle.prototype.move = function move(x){
+    //constant here because the paddle can't move in the Y direction
+    const y = this.y;
+    this.x = x;
+
+    this.shape.setOffset( new SAT.Vector(x, 0))
+};
 Paddle.prototype.getPathPoints = function getPathPoints(){
     /*
         paddle trapezoid diagram
@@ -55,7 +64,6 @@ Paddle.prototype.getPathPoints = function getPathPoints(){
 Paddle.prototype.getReflectedVelocity = function getReflectedVelocity(obj){
     //returns new velocity based on angle
 
-
     //dont do any of this if the ball isn't anywhere near the paddle
     if(canvas.height - this.height >= obj.y + obj.radius){
         return false;
@@ -63,13 +71,9 @@ Paddle.prototype.getReflectedVelocity = function getReflectedVelocity(obj){
 
     const pathPoints = this.getPathPoints();
 
-
     const ballCircle = new SAT.Circle(new SAT.Vector(obj.x, obj.y), obj.radius);
-    const poly = new SAT.Polygon(new SAT.Vector(0,0), pathPoints.map(function(pt){
-        return new SAT.Vector(pt.x, pt.y);
-    }));
-
-
+    const poly = this.shape;
+  
     //overlays the poly in SAT
     ctx.beginPath();
     ctx.moveTo(this.x, this.y);
@@ -91,7 +95,6 @@ Paddle.prototype.getReflectedVelocity = function getReflectedVelocity(obj){
 
         const unitNormalVector = new SAT.Vector(overlapVector.x, overlapVector.y).normalize().clone();
 
-
         const dotProduct = velocityVector.clone().dot(unitNormalVector) * 2;
         const scaledNormal = unitNormalVector.clone().scale(dotProduct, dotProduct);
         const answer = velocityVector.clone().sub(scaledNormal);
@@ -100,9 +103,15 @@ Paddle.prototype.getReflectedVelocity = function getReflectedVelocity(obj){
             dx: answer.x,
             dy: answer.y
         };
-        // console.log('dx, dy', dx, dy, 'old dx, dy', answer.x, answer.yas)
     } else{
         return false;
     }
+};
+Paddle.prototype.updatePaddleVelocity = function updatePaddleVelocity(){
+    //not used yet for more than debugging things; may come in handy later
+    const velocity = this.previousFrameX - this.x;
+    
+    this.previousFrameX = this.x;
+    this.velocity = velocity;
 };
 
