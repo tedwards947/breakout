@@ -16,4 +16,4 @@ var possibleBrickColors = {
     purple: '#663399'
 };
 */
-function Brick(x, y, width, height)
+// function Brick(x, y, width, height)

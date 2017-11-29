@@ -26,7 +26,7 @@ let isFloorBlocked = false;
 
 
 var brickRowCount = 4;
-var brickColumnCount = 7; //7
+var brickColumnCount = 7; 
 var brickWidth = 75;
 var brickHeight = 20;
 var brickPadding = 10;
@@ -512,51 +512,38 @@ function addPhantomObject(obj){
 
 
 
-function detectFaceCollision (brick){
-    const rightOfBrickBorder = ball.x + ball.radius > brick.x;
-    const leftOfBrickBorder = ball.x - ball.radius < brick.x + brick.width;
-    const belowBrick = ball.y + ball.radius > brick.y;
-    const aboveBrick = ball.y - ball.radius < brick.y + brick.height;
+function detectBrickCollision (brick){
+    //short circuit if the ball isn't equal or above the lowest Y value
+    if (brick.y + brick.height <= ball.y - 10) {
+        return false;
+    }
 
-    /*
-        The x position of the ball is greater than the x position of the brick.
-        The x position of the ball is less than the x position of the brick plus its width.
-        The y position of the ball is greater than the y position of the brick.
-        The y position of the ball is less than the y position of the brick plus its height.
-    */
-    return ( 
-        rightOfBrickBorder && 
-        leftOfBrickBorder && 
-        belowBrick && 
-        aboveBrick 
-    );
-}
-function detectSideCollision(brick){
-    /*
-        write commentl ol
-    */
-    const leftOfBrick  = ball.x + ball.radius >= brick.x;
-    const rightOfBrick = ball.x - ball.radius <= brick.x + brick.width;
-    const belowBrick   = ball.y - ball.radius >= brick.y;
-    const aboveBrick   = ball.y + ball.radius <= brick.y + brick.height;
+    const ballCircle = ball.getSATCircle()//new SAT.Circle(new SAT.Vector(ball.x, ball.y), ball.radius);
+    const brickPolygon = new SAT.Box(new SAT.Vector(brick.x, brick.y), brick.width, brick.height).toPolygon();
+
+    const response = new SAT.Response();
+
+    const isCollision = SAT.testPolygonCircle(brickPolygon, ballCircle, response);
+
+    if(isCollision){
+        const overlapVector = response.overlapN;
+        
+        const velocityVector = new SAT.Vector(ball.dx, ball.dy);
+
+        const unitNormalVector = new SAT.Vector(overlapVector.x, overlapVector.y).normalize().clone();
 
 
-    return ( 
-        leftOfBrick && 
-        rightOfBrick && 
-        belowBrick && 
-        aboveBrick 
-    );
+        const dotProduct = velocityVector.clone().dot(unitNormalVector) * 2;
+        const scaledNormal = unitNormalVector.clone().scale(dotProduct, dotProduct);
+        const answer = velocityVector.clone().sub(scaledNormal);
 
-    /*
-    Gotta be 
-        at the left border of the brick
-        at the right border of the brick
-        between the top and the bottom
-    */
-
- 
-
+        return {
+            dx: answer.x,
+            dy: answer.y
+        };
+    } else {
+        return false;
+    }
 }
 
 function brickCollisionDetection() {
@@ -568,22 +555,13 @@ function brickCollisionDetection() {
             return;
         }
 
-        const isFaceCollision = detectFaceCollision(b);
-        const isSideCollision = detectSideCollision(b);
 
-        if(isFaceCollision || isSideCollision) {
-            //we've detected a collision!
+        const brickCollisionResultantBallVelocityVector = detectBrickCollision(b);
 
-            //reverse the ball's direction
-            if(isFaceCollision){
-                //if it's a face collision, reverse the y direction
-                ball.dy = -ball.dy;
-            } else if(isSideCollision){
-                //if it's a face collision, reverse the x direction
-                ball.dx = -ball.dx;
-            }
+        if(brickCollisionResultantBallVelocityVector){
 
-            // ball.decayVelocityOnBounce();
+            ball.dx = brickCollisionResultantBallVelocityVector.dx;
+            ball.dy = brickCollisionResultantBallVelocityVector.dy;
 
             //DESTROY the brick 
             b.status = 0;
@@ -608,10 +586,6 @@ function brickCollisionDetection() {
                     ++score;
             }
 
-            //detect win condition
-            // if(checkForWin()){
-            //     gameState = 'win';
-            // }
         }
 
     });

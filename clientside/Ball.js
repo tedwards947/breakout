@@ -31,11 +31,12 @@ Ball.prototype.decayVelocityOnBounce = function decayVelocityOnBounce(){
     const absdy = Math.abs(this.dy);
 
     if(absdx > INITIAL_DX_MAGNITUDE){
-        console.log('nerfing x velocity')
         this.dx = dxSign * (absdx - 1);
     } 
     if(absdy > INITIAL_DY_MAGNITUDE){
-        console.log('nerfing y velocity')
         this.dy = dySign * (absdy - 1);
     }
+};
+Ball.prototype.getSATCircle = function getSATCircle(){
+    return new SAT.Circle(new SAT.Vector(ball.x, ball.y), ball.radius);
 };
