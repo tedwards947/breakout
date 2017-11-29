@@ -34,7 +34,7 @@ const POWERUP_TYPES = [
         color: 'orange',
         action: function(){
             //give  another life
-            ++game.lives;
+            game.addLife(1);
         }
     }
 ];

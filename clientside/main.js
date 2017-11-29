@@ -179,7 +179,7 @@ function drawBall() {
 
     game.ctx.beginPath();
     game.ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
-    game.ctx.fillStyle = ball.color;
+    game.ctx.fillStyle = ball.updateBallColor();
     game.ctx.fill();
     game.ctx.closePath();
 }
@@ -227,9 +227,9 @@ function bounceBallOffWallsOrPaddle(){
         ball.dy = -ball.dy;
     }
     else if(isBottomHit) {
-        --game.lives;
+        game.addLife(-1);
 
-        if(game.lives !== 0){
+        if(!game.hasLost){
             ball.reset();
         }
     }
@@ -267,6 +267,13 @@ function drawPowerups(){
     });
 }
 
+function drawScoreStreak(){
+    game.ctx.font = "16px Arial";
+    game.ctx.fillStyle = "#0095DD";
+    game.ctx.fillText("Streak!: " + game.scoreStreakCounter , 8, 200);
+}
+
+
 function draw() {
     if(game.isPaused){
         return;
@@ -282,6 +289,7 @@ function draw() {
     drawPaddle();
     drawLives();
     drawScore();
+    // drawScoreStreak();
 
     animatePhantomObjects();
 
@@ -487,23 +495,21 @@ function brickCollisionDetection() {
             //increment the score
             switch (b.worth){
                 case 'blue':
-                    ++game.score;
+                    game.addScore(1);
                     break;
                 case 'green':
-                    game.score += 2;
+                    game.addScore(2);
                     break;
                 case 'gold': 
-                    game.score += 3;
+                    game.addScore(3);
                     break;
                 case 'purple':
                     dropPowerup(b);
                     break;
                 default:
-                    ++game.score;
+                    game.addScore(1);
             }
-
         }
-
     });
 }
 

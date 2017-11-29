@@ -28,6 +28,20 @@ function Ball(x = 0, y = 0, dx = 4, dy = -4, radius = 10, color = '#000000') {
     this.type = 'ball';
 
 }
+Ball.prototype.updateBallColor = function updateBallColor(){
+    //flexes ball's color based on score streak!
+
+    const colors = [
+        '#000000',
+        '#FF0000',
+        '#ff9400',
+        '#ffe100'
+    ];
+
+    this.color = colors[game.scoreStreakCounter - 1] || colors[0];
+    return this.color;
+
+};
 Ball.prototype.decayVelocityOnBounce = function decayVelocityOnBounce(){
     //degrade the velocity due to bounces
     const dxSign = Math.sign(this.dx);
