@@ -264,7 +264,7 @@ function bounceBallOffWallsOrPaddle(){
     const isBottomHit = (ball.y + ball.dy > canvas.height - ball.radius);
 
     const paddleHitReflectedVelocity = paddle.getReflectedVelocity(ball);
-    const isPaddleHit = !!paddleHitReflectedVelocity;
+    const isPaddleHit = !!paddleHitReflectedVelocity && !paddle.wasJustHit;
 
     if(isSideHit) {
         ball.dx = -ball.dx;
@@ -274,9 +274,13 @@ function bounceBallOffWallsOrPaddle(){
         ball.dy = -ball.dy;
     } 
     else if(isPaddleHit){
-        //simple reflection
+        paddle.wasJustHit = true;
+    
         ball.dx = paddleHitReflectedVelocity.dx;
         ball.dy = paddleHitReflectedVelocity.dy;
+
+        //return here so we don't reset paddle.wasJustHit
+        return;
     } else if(isBottomHit && isFloorBlocked){
         //allow a bounce if the floor is blocked! lucky u.
         ball.dy = -ball.dy;
@@ -291,8 +295,9 @@ function bounceBallOffWallsOrPaddle(){
             ball.reset();
         }
     }
-}
 
+    paddle.wasJustHit = false;
+}
 
 function dropPowerup(brick){
     var pu = new Powerup(brick.x + brick.width / 2, brick.y + brick.height, 0, 1);
@@ -381,8 +386,10 @@ function draw() {
     if(!isPaused){
         requestAnimationFrame(draw);
     }
- 
-    if(lives <= 0 || checkForWin()){
+    
+    const hasNoLivesLeft = (lives <= 0 );
+    const hasWon = checkForWin();
+    if(hasNoLivesLeft || hasWon){
         ball.dx = 0;
         ball.dy = 0;
     }

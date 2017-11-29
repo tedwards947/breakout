@@ -6,6 +6,8 @@ function Paddle(x = 0, height = 20, width = 100, color = '#0095DD', radius = 5){
     this.color = color;
     this.radius = radius;
 
+    //used to make sure that we don't do collisions too frequently
+    this.wasJustHit = false;
 
     this.velocity = 0;
 
