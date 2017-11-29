@@ -44,7 +44,7 @@ Ball.prototype.decayVelocityOnBounce = function decayVelocityOnBounce(){
     }
 };
 Ball.prototype.getSATCircle = function getSATCircle(){
-    return new SAT.Circle(new SAT.Vector(ball.x, ball.y), ball.radius);
+    return new SAT.Circle(new SAT.Vector(this.x, this.y), this.radius);
 };
 Ball.prototype.reset = function reset(){
     this.isLaunched = false;
@@ -54,6 +54,6 @@ Ball.prototype.reset = function reset(){
     this.dy = this.initialDy;
 
     //fix the position of the ball to the paddle
-    this.x = paddle.x + (paddle.width / 2);
-    this.y = canvas.height - paddle.height - this.radius;
+    this.x = game.paddle.x + (game.paddle.width / 2);
+    this.y = game.canvas.height - game.paddle.height - this.radius;
 };

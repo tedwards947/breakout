@@ -9,10 +9,10 @@ const POWERUP_TYPES = [
             //the floor is not lava
             isFloorBlocked = true;
 
-            canvas.style.borderBottom = '3px dashed red';
+            game.canvas.style.borderBottom = '3px dashed red';
 
             setTimeout(function(){
-                canvas.style.borderBottom = '0';
+                game.canvas.style.borderBottom = '0';
                 isFloorBlocked = false;
             }, 5000);
         }
@@ -23,9 +23,9 @@ const POWERUP_TYPES = [
         action: function(){
             //double the width of the ball
 
-            ball.radius = 20;
+            game.ball.radius = 20;
             setTimeout(function(){
-                ball.radius = 10;
+                game.ball.radius = 10;
             }, 15000);
         }
     },
@@ -34,7 +34,7 @@ const POWERUP_TYPES = [
         color: 'orange',
         action: function(){
             //give  another life
-            ++lives;
+            ++game.lives;
         }
     }
 ];

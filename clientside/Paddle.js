@@ -1,6 +1,6 @@
 function Paddle(x = 0, height = 20, width = 100, color = '#0095DD', radius = 5){
     this.x = x;
-    this.y = canvas.height;
+    this.y = game.canvas.height;
     this.height = height;
     this.width = width;
     this.color = color;
@@ -53,6 +53,8 @@ Paddle.prototype.getPathPoints = function getPathPoints(){
         g: (same as a, so that we go back to home)
 
     */
+
+    const canvas = game.canvas;
     return [
         {x: this.x, y: canvas.height}, //a
         {x: this.x, y: canvas.height - (this.height / 2)}, //b
@@ -65,6 +67,7 @@ Paddle.prototype.getPathPoints = function getPathPoints(){
 };
 Paddle.prototype.getReflectedVelocity = function getReflectedVelocity(obj){
     //returns new velocity based on angle
+    const canvas = game.canvas;
 
     //dont do any of this if the ball isn't anywhere near the paddle
     if(canvas.height - this.height >= obj.y + obj.radius){
@@ -77,13 +80,13 @@ Paddle.prototype.getReflectedVelocity = function getReflectedVelocity(obj){
     const poly = this.shape;
   
     //overlays the poly in SAT
-    ctx.beginPath();
-    ctx.moveTo(this.x, this.y);
+    game.ctx.beginPath();
+    game.ctx.moveTo(this.x, this.y);
     poly.calcPoints.forEach(function(pt){
-        ctx.lineTo(pt.x, pt.y);
+        game.ctx.lineTo(pt.x, pt.y);
     });
-    ctx.stroke();
-    ctx.closePath();
+    game.ctx.stroke();
+    game.ctx.closePath();
     
     const response = new SAT.Response();
 
