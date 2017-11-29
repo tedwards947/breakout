@@ -288,7 +288,7 @@ function bounceBallOffWallsOrPaddle(){
             gameState = "loss";
         }
         else {
-            resetBall();
+            ball.reset();
         }
     }
 }
@@ -322,18 +322,6 @@ function drawPowerups(){
         pu.x += pu.dx;
         pu.y += pu.dy;
     });
-}
-
-function resetBall(){
-    ball.isLaunched = false;
-
-    //reset initial velocity
-    ball.dx = INITIAL_DX;
-    ball.dy = INITIAL_DY;
-
-    //fix the position of the ball to the paddle
-    ball.x = paddle.x + (paddle.width / 2);
-    ball.y = canvas.height - paddle.height - ball.radius;
 }
 
 function draw() {
@@ -373,11 +361,11 @@ function draw() {
         ball.y += ball.dy;
 
         if(ball.dx === 0 && ball.dy === 0){
-            resetBall();
+            ball.reset();
         }
     } else {
         //fix the position of the ball to the paddle
-        resetBall();
+        ball.reset();
     }
 
     
